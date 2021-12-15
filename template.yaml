@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-java-restapi-s3
+
+  Sample SAM Template for sam-java-restapi-s3
+
+Globals:
+  Function:
+    Timeout: 20
+
+Resources:
+  QuotesBucket:
+    Type: AWS::S3::Bucket
+
+  CreateQuoteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: QuotesApi
+      Handler: com.thecodinginterface.quotes.CreateQuote::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          QUOTES_BUCKET: !Ref QuotesBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref QuotesBucket
+      Events:
+        QuotesApi:
+          Type: Api
+          Properties:
+            Path: /quotes
+            Method: post
+
+  ListQuotesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: QuotesApi
+      Handler: com.thecodinginterface.quotes.ListQuotes::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          QUOTES_BUCKET: !Ref QuotesBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref QuotesBucket
+      Events:
+        QuotesApi:
+          Type: Api
+          Properties:
+            Path: /quotes
+            Method: get
+
+  GetQuoteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: QuotesApi
+      Handler: com.thecodinginterface.quotes.GetQuote::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          QUOTES_BUCKET: !Ref QuotesBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref QuotesBucket
+      Events:
+        QuotesApi:
+          Type: Api
+          Properties:
+            Path: /quotes/{author}/{filename}
+            Method: get
+
+  DeleteQuoteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: QuotesApi
+      Handler: com.thecodinginterface.quotes.DeleteQuote::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          QUOTES_BUCKET: !Ref QuotesBucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref QuotesBucket
+      Events:
+        QuotesApi:
+          Type: Api
+          Properties:
+            Path: /quotes/{author}/{filename}
+            Method: delete
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  QuotesApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  QuotesBucket:
+    Description: S3 Bucket for Quotes Datastore
+    Value: !Ref QuotesBucket
