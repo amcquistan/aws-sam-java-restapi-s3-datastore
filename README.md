@@ -99,7 +99,7 @@ Tests are defined in the `QuotesApi/src/test` folder in this project.
 
 ```bash
 sam-java-restapi-s3$ cd QuotesApi
-HelloWorldFunction$ mvn test
+QuotesApi$ mvn test
 ```
 
 ## Cleanup
